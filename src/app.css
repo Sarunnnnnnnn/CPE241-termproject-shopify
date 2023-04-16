@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.font-poppins {
+    font-family: 'Poppins', sans-serif;
+}
+
+.font-general {
+    font-family: 'Poppins', sans-serif;
+    color: #48466D;
+}
+
+.font-gray {
+    font-family: 'Poppins', sans-serif;
+    color: #52525B;
+}
+
+.font-lightgray {
+    font-family: 'Poppins', sans-serif;
+    color: #707070;
+}
