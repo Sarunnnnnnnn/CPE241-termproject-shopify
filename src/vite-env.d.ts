@@ -14,3 +14,4 @@ declare module '*.jpg' {
 }
 
 declare module 'styled-components';
+/// <reference types="vite/client" />
