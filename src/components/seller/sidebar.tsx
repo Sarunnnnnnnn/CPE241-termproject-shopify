@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { SidebarData } from "./siderbarData";
+import { SidebarData } from "./sidebarData";
 import Submenu from "./subMenu";
 
 
