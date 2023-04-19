@@ -1,13 +1,13 @@
 import React from "react";
-import  Home  from '../assets/Home.svg'
-import  ArrowUp from '../assets/ArrowUp.svg'
-import  ArrowDown  from '../assets/ArrowDown.svg'
-import  IconOrder  from '../assets/Order.svg'
-import  setting  from '../assets/setting.svg'
-import  finan  from '../assets/Finance.svg'
-import  analy from '../assets/Analytic.svg'
-import  product  from '../assets/Product.svg'
-import { SideBarItem } from "../models/SideBarItem";
+import  Home  from '../../assets/Home.svg'
+import  ArrowUp from '../../assets/ArrowUp.svg'
+import  ArrowDown  from '../../assets/ArrowDown.svg'
+import  IconOrder  from '../../assets/Order.svg'
+import  setting  from '../../assets/setting.svg'
+import  finan  from '../../assets/Finance.svg'
+import  analy from '../../assets/Analytic.svg'
+import  product  from '../../assets/Product.svg'
+import { SideBarItem } from "../../models/SideBarItem";
 
 export const SidebarData:SideBarItem[] = [
     {

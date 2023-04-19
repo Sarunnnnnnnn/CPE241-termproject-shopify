@@ -20,7 +20,12 @@
 
 .font-lightgray {
     font-family: 'Poppins', sans-serif;
-    color: #707070;
+    color: #808080;
+}
+
+.font-heavygray {
+    font-family: 'Poppins', sans-serif;
+    color: #4F4F4F;
 }
 
 @layer base {
