@@ -23,9 +23,19 @@
     color: #808080;
 }
 
+.font-midgray {
+    font-family: 'Poppins', sans-serif;
+    color: #616161;
+}
+
 .font-heavygray {
     font-family: 'Poppins', sans-serif;
     color: #4F4F4F;
+}
+
+.font-orange {
+    font-family: 'Poppins', sans-serif;
+    color: #FF4500;
 }
 
 @layer base {
