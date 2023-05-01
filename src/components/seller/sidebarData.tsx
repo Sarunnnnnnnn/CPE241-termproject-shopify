@@ -1,4 +1,3 @@
-import React from "react";
 import  Home  from '../../assets/Home.svg'
 import  ArrowUp from '../../assets/ArrowUp.svg'
 import  ArrowDown  from '../../assets/ArrowDown.svg'
@@ -12,9 +11,8 @@ import { SideBarItem } from "../../models/SideBarItem";
 export const SidebarData:SideBarItem[] = [
     {
         title: 'Home',
-        path: '/Home',
+        path: '/homeSeller',
         icon: <img src={Home} alt="" />,
-        
     },
 
     {
@@ -25,8 +23,7 @@ export const SidebarData:SideBarItem[] = [
         subNav:[
             {
                 title: 'My Order',
-                path: '/myorder',
-                
+                path: '/myOrder',
             },
             {
                 title: 'Order History',
@@ -44,20 +41,20 @@ export const SidebarData:SideBarItem[] = [
         subNav:[
             {
                 title: 'My Products',
-                path: '/MyProducts',
-                
+                path: '/myProducts',
             },
             {
                 title: 'Add New Product',
-                path: '/MyProducts/orderHistory',
+                path: '/myProducts/orderHistory',
             },
             {
                 title: 'Stock History',
-                path: '/Stock History',
+                path: '/stockHistory',
             }
 
         ]
     },
+
     {
         title: 'Analytics',
         icon: <img src={analy} alt="" />,
@@ -66,20 +63,20 @@ export const SidebarData:SideBarItem[] = [
         subNav:[
             {
                 title: 'Sales Overview',
-                path: '/SalesOverview',
-                
+                path: '/salesOverview',
             },
             {
                 title: 'Shipping Company Score',
-                path: '/ShippingCompanyScore',
+                path: '/shippingCompanyScore',
             },
             {
                 title: 'Customer Insight',
-                path: '/CustomerInsight',
+                path: '/customerInsight',
             }
 
         ]
     },
+
     {
         title: 'Finance',
         icon: <img src={finan} alt="" />,
@@ -88,16 +85,16 @@ export const SidebarData:SideBarItem[] = [
         subNav:[
             {
                 title: 'My Balance',
-                path: '/order/myorder',
-                
+                path: '/myBalance',
             },
             {
                 title: 'Bank Account',
-                path: '/Bankaccount',
+                path: '/bankAccount',
             }
 
         ]
     },
+
     {
         title: 'Setting',
         icon: <img src={setting} alt="" />,
@@ -106,12 +103,11 @@ export const SidebarData:SideBarItem[] = [
         subNav:[
             {
                 title: 'My Address',
-                path: '/MyAddress',
-                
+                path: '/myAddress',
             },
             {
                 title: 'Shop profile',
-                path: '/Shopprofile',
+                path: '/shopProfile',
             }
 
         ]
