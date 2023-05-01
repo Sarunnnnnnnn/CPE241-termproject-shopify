@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
-//const navigate = useNavigate();
+
 interface LoginFormProps {
   onSubmit: (user: { email: string, password: string }) => void;
 }
 
-const CustomerLoginForm = ({ onSubmit }: LoginFormProps) => {
+const LoginSeller = ({ onSubmit }: LoginFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -17,7 +17,7 @@ const CustomerLoginForm = ({ onSubmit }: LoginFormProps) => {
     try {
       const response = await axios({
         method: 'post',
-        url: 'http://localhost:3001/login',
+        url: 'http://localhost:3001/loginSeller',
         headers: {
           'Content-Type': 'application/json',
           "Access-Control-Allow-Origin":"*"
@@ -33,7 +33,7 @@ const CustomerLoginForm = ({ onSubmit }: LoginFormProps) => {
       if (user.status=="1") {
         onSubmit(user);
         localStorage.setItem("access_token",response.data.access_token);
-        navigate('/*');
+        navigate('/HomeSeller');
       } else {
         setLoginError('Invalid email or password.');
       }
@@ -63,4 +63,4 @@ const CustomerLoginForm = ({ onSubmit }: LoginFormProps) => {
   );
 };
 
-export default CustomerLoginForm;
+export default LoginSeller;

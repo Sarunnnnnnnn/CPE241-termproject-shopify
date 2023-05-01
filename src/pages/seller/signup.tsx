@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
-function Signup() {
+
+function SignupSeller() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         email: '',
         password: '',
-        gen: '',
+        gender: '',
         phone: '',
         dob: '',
     });
@@ -17,17 +18,14 @@ function Signup() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            const response = await axios.post('http://localhost:3001/signup', {
+            const response = await axios.post('http://localhost:3001/signupSeller', {
                 fname: formData.firstName,
                 lname: formData.lastName,
                 email: formData.email,
                 password: formData.password,
-                gen:formData.gen,
-                phone:formData.phone,
-                dob:formData.dob
             });
             console.log(response.data.message);
-            navigate('/login');
+            navigate('/loginSeller');
         } catch (error) {
             console.error(error);
         }
@@ -57,8 +55,8 @@ function Signup() {
             <label htmlFor="password" className='col-start-1 text-[#48466D] font-semibold flex justify-end'>Password:</label>
             <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} required className='col-start-2 border-2 rounded border-gray-500 hover:border-[#48466D]'/>
 
-            <label htmlFor="gen" className='col-start-1 text-[#48466D] font-semibold flex justify-end'>Gender:</label>
-            <select id="gen" name="gen" value={formData.gen} onChange={handleChange} required className='col-start-2 border-2 rounded border-gray-500 hover:border-[#48466D]'>
+            <label htmlFor="gender" className='col-start-1 text-[#48466D] font-semibold flex justify-end'>Gender:</label>
+            <select id="gender" name="gender" value={formData.gender} onChange={handleChange} required className='col-start-2 border-2 rounded border-gray-500 hover:border-[#48466D]'>
                 <option value="">Select Gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -77,4 +75,4 @@ function Signup() {
     );
 }
 
-export default Signup;
+export default SignupSeller;
