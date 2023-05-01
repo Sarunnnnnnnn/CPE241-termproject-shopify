@@ -6,7 +6,7 @@ import  setting  from '../assets/setting.svg'
 import  finan  from '../assets/Finance.svg'
 import  analy from '../assets/Analytic.svg'
 import  product  from '../assets/Product.svg'
-import { SideBarItem } from "../models/SideBarItem";
+import { SideBarItem } from "../../models/SideBarItem";
 import purchase from '../assets/purchase.svg'
 
 export const SidebarData:SideBarItem[] = [
