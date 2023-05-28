@@ -418,8 +418,8 @@ const Cart: React.FC<CartItemProps> = ({ shop, products }) => {
         return acc;
     }, {} as Record<number, Product[]>);
 
-    // get products of current shop
-    const cartProducts = productsByShop[shop.ShopID] ?? [];
+ // get products of current shop
+const cartProducts = productsByShop[shop[0]?.id] ?? [];
 
     // state for selected items
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -482,7 +482,7 @@ const Cart: React.FC<CartItemProps> = ({ shop, products }) => {
             </div>
             <div className="flex flex-col">
                 <div className="flex flex-row justify-between items-center mx-8 m-4">
-                    <p className="text-2xl font-semibold text-[#48466D]">{shop.name}</p>
+                    <p className="text-2xl font-semibold text-[#48466D]">{shop[0].name}</p>
                     <p className="text-sm font-medium text-[#48466D]">Total ({totalQuantity} item(s)) : ฿{subtotal}</p>
                 </div>
                 <div className="flex flex-col mx-8 m-4">
