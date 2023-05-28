@@ -1,0 +1,44 @@
+@keyframes slide {
+    0% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-100%);
+    }
+    45% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(-200%);
+    }
+    70% {
+      transform: translateX(-200%);
+    }
+    75% {
+      transform: translateX(-300%);
+    }
+    95% {
+      transform: translateX(-300%);
+    }
+    100% {
+      transform: translateX(-400%);
+    }
+  }
+  
+.slide {
+    display: flex;
+    overflow: hidden;
+    animation: slide 15s linear infinite;
+}
+
+.slide img {
+    width: 100%;
+    height: auto;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
