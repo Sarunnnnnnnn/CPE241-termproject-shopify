@@ -128,9 +128,8 @@ const AddProductForm: React.FC<Props> = ({ onProductAdd }) => {
     }
   };
 
-  const [selectedCategoryId, setSelectedCategoryId] = useState(""); // เพิ่ม state สำหรับเก็บค่า category ที่ถูกเลือก
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
 
-  // เพิ่ม function สำหรับ handle เมื่อเลือก category ใน dropdown
   const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategoryId(event.target.value);
   };
@@ -168,9 +167,8 @@ const AddProductForm: React.FC<Props> = ({ onProductAdd }) => {
 
   const [showImageOption, setShowImageOption] = useState(false);
   const [imageOption, setImageOption] = useState<File[]>([]);
-  const [optionList, setOptionList] = useState<string[]>([]);
 
-  const handleAddImageOption = () => {
+  const handleAddImageChange = () => {
     setShowImageOption(true);
   };
 
@@ -178,23 +176,8 @@ const AddProductForm: React.FC<Props> = ({ onProductAdd }) => {
     const files = event.target.files;
     if (files) {
       const newImageOption = Array.from(files);
-      setImageOption([...imageOption, ...newImageOption]);
+      setImageOption(newImageOption);
     }
-  };
-
-  const handleAddOption = () => {
-    const optionInput = document.getElementById('product-options') as HTMLInputElement;
-    const optionValue = optionInput.value.trim();
-    if (optionValue && optionList.length < 30) {
-      setOptionList([...optionList, optionValue]);
-      optionInput.value = '';
-    }
-  };
-
-  const handleDeleteOption = (index: number) => {
-    const updatedOptions = [...optionList];
-    updatedOptions.splice(index, 1);
-    setOptionList(updatedOptions);
   };
 
   const handleDeleteImageOption = (index: number) => {
@@ -209,6 +192,39 @@ const AddProductForm: React.FC<Props> = ({ onProductAdd }) => {
     setImage(null);
     setSelectedCategoryId("");
     setSelectedVariation(null);
+  };
+
+  interface Option {
+    name?: string;
+    price?: number;
+    weight?: number;
+    stock?: number;
+    images?: File[];
+  }
+
+  const [options, setOptions] = useState<Option[]>([]);
+  const [currentOption, setCurrentOption] = useState<Option | null>(null);
+
+  const handleAddOption = () => {
+    if (options.length >= 30) {
+      return; 
+    }
+    setOptions([...options, currentOption ?? {}]);
+    setCurrentOption(null);
+  };
+
+  const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, files } = e.target;
+    setCurrentOption((prevOption) => ({
+      ...prevOption,
+      [name]: files ? Array.from(files) : value,
+    }));
+  };
+
+  const handleDeleleOption = (index: number) => {
+    const updatedOptions = [...options];
+    updatedOptions.splice(index, 1);
+    setOptions(updatedOptions);
   };
 
   return (
@@ -251,7 +267,7 @@ const AddProductForm: React.FC<Props> = ({ onProductAdd }) => {
               id="category"
               name="category"
               className="col-start-2 w-[250px] border-[1px] border-[#AFAFAF] h-[30px] rounded-[5px] pl-[10px]"
-              onChange={handleCategoryChange} // เพิ่ม event listener เมื่อเลือก category
+              onChange={handleCategoryChange}
             >
               <option value="">-- select category --</option>
               {category().sort((a, b) => a.name.localeCompare(b.name)).map((category) => (
@@ -269,8 +285,8 @@ const AddProductForm: React.FC<Props> = ({ onProductAdd }) => {
             >
               <option value="">-- select subcategory --</option>
               {category()
-                .find((category) => category.id === Number(selectedCategoryId)) // หา category ที่ถูกเลือก
-                ?.subcategories.sort((a, b) => a.name.localeCompare(b.name)) // เรียง subcategories ตามชื่อใน ascending order
+                .find((category) => category.id === Number(selectedCategoryId))
+                ?.subcategories.sort((a, b) => a.name.localeCompare(b.name))
                 .map((subcategory) => (
                   <option key={subcategory.id} value={subcategory.id}>
                     {subcategory.name}
@@ -283,7 +299,7 @@ const AddProductForm: React.FC<Props> = ({ onProductAdd }) => {
               id="product-variation"
               name="product-variation"
               className="col-start-2 w-[250px] border-[1px] border-[#AFAFAF] h-[30px] rounded-[5px] pl-[10px]"
-              onChange={handleVariationChange} // เพิ่ม event listener เมื่อเลือก variation
+              onChange={handleVariationChange}
             >
               <option value="">-- select variation --</option>
               {variation().sort((a, b) => a.name.localeCompare(b.name)).map((variation) => (
@@ -297,126 +313,143 @@ const AddProductForm: React.FC<Props> = ({ onProductAdd }) => {
               <>
                 <label htmlFor="product-options" className="col-start-1 flex justify-end font-medium mt-[28px]">*Option</label>
 
-                <div className="flex flex-row gap-[15px]">
-                  <div className="flex flex-col gap-[3px]">
-                    <label htmlFor="product-options" className="items-end font-medium">
-                      *Option name
-                    </label>
-                    <input
-                      id="product-options"
-                      name="product-options"
-                      type="text"
-                      required
-                      maxLength={30}
-                      className="w-[140px] border-[1px] border-[#AFAFAF] h-[30px] rounded-[5px] pl-[10px]"
-                    />
-                  </div>
+                <div className="">
+                  {options.map((option, index) => (
+                    <div className="flex flex-col gap-[15px]">
+                      <div key={index} className="flex flex-row gap-[15px]">
+                        <div className="flex flex-col gap-[3px]">
+                          <label htmlFor={`option-name-${index}`} className="items-end font-medium">
+                            *Option name
+                          </label>
+                          <input
+                            id={`option-name-${index}`}
+                            name={`option-name-${index}`}
+                            value={option.name}
+                            type="text"
+                            required
+                            maxLength={30}
+                            onChange={handleOptionChange}
+                            className="w-[140px] border-[1px] border-[#AFAFAF] h-[30px] rounded-[5px] pl-[10px]"
+                            disabled={!selectedVariation}
+                          />
+                        </div>
 
-                  <div className="flex flex-col gap-[3px]">
-                    <label htmlFor="product-price" className="items-end font-medium">
-                      *Price (THB)
-                    </label>
-                    <input
-                      id="product-price"
-                      name="product-price"
-                      type="number"
-                      required
-                      className="w-[140px] border-[1px] border-[#AFAFAF] h-[30px] rounded-[5px] pl-[10px]"
-                      disabled={!selectedVariation} // ถ้าไม่ได้เลือก variation จะไม่สามารถกรอก price ได้
-                    />
-                  </div>
+                        <div className="flex flex-col gap-[3px]">
+                          <label htmlFor={`option-price-${index}`} className="items-end font-medium">
+                            *Price (THB)
+                          </label>
+                          <input
+                            id={`option-price-${index}`}
+                            name={`option-price-${index}`}
+                            value={option.price}
+                            type="number"
+                            required
+                            onChange={handleOptionChange}
+                            className="w-[140px] border-[1px] border-[#AFAFAF] h-[30px] rounded-[5px] pl-[10px]"
+                            disabled={!selectedVariation}
+                          />
+                        </div>
 
-                  <div className="flex flex-col gap-[3px]">
-                    <label htmlFor="product-weight" className="items-end font-medium">
-                      *Weight (g)
-                    </label>
-                    <input
-                      id="product-weight"
-                      name="product-weight"
-                      type="number"
-                      required
-                      className="w-[140px] border-[1px] border-[#AFAFAF] h-[30px] rounded-[5px] pl-[10px]"
-                      disabled={!selectedVariation} // ถ้าไม่ได้เลือก variation จะไม่สามารถกรอก weight ได้
-                    />
-                  </div>
+                        <div className="flex flex-col gap-[3px]">
+                          <label htmlFor={`option-weight-${index}`} className="items-end font-medium">
+                            *Weight (g)
+                          </label>
+                          <input
+                            id={`option-weight-${index}`}
+                            name={`option-weight-${index}`}
+                            value={option.weight}
+                            type="number"
+                            required
+                            onChange={handleOptionChange}
+                            className="w-[140px] border-[1px] border-[#AFAFAF] h-[30px] rounded-[5px] pl-[10px]"
+                            disabled={!selectedVariation}
+                          />
+                        </div>
 
-                  <div className="flex flex-col gap-[3px]">
-                    <label htmlFor="product-stock" className="items-end font-medium">
-                      *Stock
-                    </label>
-                    <input
-                      id="product-stock"
-                      name="product-stock"
-                      type="number"
-                      required
-                      className="w-[140px] border-[1px] border-[#AFAFAF] h-[30px] rounded-[5px] pl-[10px]"
-                      disabled={!selectedVariation}
-                    />
-                  </div>
+                        <div className="flex flex-col gap-[3px]">
+                          <label htmlFor={`option-stock-${index}`} className="items-end font-medium">
+                            *Stock
+                          </label>
+                          <input
+                            id={`option-stock-${index}`}
+                            name={`option-stock-${index}`}
+                            value={option.stock}
+                            type="number"
+                            required
+                            onChange={handleOptionChange}
+                            className="w-[140px] border-[1px] border-[#AFAFAF] h-[30px] rounded-[5px] pl-[10px]"
+                            disabled={!selectedVariation}
+                          />
+                        </div>
 
-                  <div className="mt-[28px]">
-                    <button
-                      className="hover:underline mr-[15px] font-medium"
-                      onClick={handleAddImageOption}
-                    >
-                      Add Image
-                    </button>
+                        <div className="mt-[28px]">
+                          <button
+                            className="hover:underline font-medium"
+                            onClick={handleAddImageChange}
+                          >
+                            Add Image
+                          </button>
+                        </div>
 
-                    <button
-                      className="hover:underline font-medium text-[#FE0202]"
-                      // onClick={handleDeleteOption}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+                        <div className="mt-[28px]">
+                          <button
+                            className="hover:underline font-medium text-[#FE0202]"
+                            onClick={() => {handleDeleleOption(index)}}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
 
-                <div className="col-start-2 flex flex-row">
-                  {imageOption.map((image, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={URL.createObjectURL(image)}
-                        alt="productImageOption"
-                        className="mb-[15px] h-[120px] w-[120px] object-cover rounded-lg border-[1px] border-[#AFAFAF]"
-                      />
-                      <img
-                        src={deleteIcon}
-                        alt="deleteIcon"
-                        onClick={() => handleDeleteImageOption(index)}
-                        className="absolute top-[5px] right-[5px] h-[20px] cursor-pointer opacity-50 hover:opacity-100 hover:duration-500"
-                      />
+                      <div className="col-start-2">
+                        {imageOption.map((image, imageIndex) => (
+                          <div key={imageIndex} className="relative">
+                            <img
+                              src={URL.createObjectURL(image)}
+                              alt="productImageOption"
+                              className="mb-[15px] h-[120px] w-[120px] object-cover rounded-lg border-[1px] border-[#AFAFAF]"
+                            />
+                            <img
+                              src={deleteIcon}
+                              alt="deleteIcon"
+                              onClick={() => handleDeleteImageOption(imageIndex)}
+                              className="absolute top-[5px] left-[95px] h-[20px] cursor-pointer opacity-50 hover:opacity-100 hover:duration-500"
+                            />
+                          </div>
+                        ))}
+
+                        {showImageOption && imageOption.length < 1 && (
+                          <label htmlFor="imageOption-upload" className="cursor-pointer mb-[15px]">
+                            <div className="mb-[15px] h-[120px] w-[120px] bg-gray-100 rounded-lg flex items-center justify-center border-[1px] border-[#AFAFAF]">
+                              <div className="flex flex-col items-center justify-center">
+                                <img src={addImage} alt="addImageIcon" />
+                                <div className="absolute text-[12px] text-gray-400 mt-[90px]">Upload Image</div>
+                              </div>
+                              <input
+                                id="imageOption-upload"
+                                name="imageOption-upload"
+                                type="file"
+                                required
+                                className="sr-only"
+                                accept="image/*"
+                                onChange={handleImageOptionChange}
+                                multiple
+                              />
+                            </div>
+                          </label>
+                        )}
+                      </div>
                     </div>
                   ))}
 
-                  {showImageOption && imageOption.length < 1 && (
-                    <label htmlFor="imageOption-upload" className="cursor-pointer mb-[15px]">
-                      <div className="h-[120px] w-[120px] bg-gray-100 rounded-lg flex items-center justify-center border-[1px] border-[#AFAFAF]">
-                        <div className="flex flex-col items-center justify-center">
-                          <img src={addImage} alt="addImageIcon" />
-                          <div className="absolute text-[12px] text-gray-400 mt-[90px]">Upload Image</div>
-                        </div>
-                        <input
-                          id="imageOption-upload"
-                          name="imageOption-upload"
-                          type="file"
-                          required
-                          className="sr-only"
-                          accept="image/*"
-                          onChange={handleImageOptionChange}
-                          multiple
-                        />
-                      </div>
-                    </label>
-                  )}
-                </div>
-
-                <div className="col-start-2 mt-[-15px]">
-                  <button
-                    className="py-1 px-3 rounded-lg border-[1px] border-[#48466D] hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
-                    onClick={handleAddOption}
-                  >
-                    Add Option
-                  </button>
+                  <div className="col-start-2">
+                    <button
+                      className="py-1 px-3 rounded-lg border-[1px] border-[#48466D] hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
+                      onClick={handleAddOption}
+                    >
+                      Add Option
+                    </button>
+                  </div>
                 </div>
               </>
             )}
@@ -457,6 +490,7 @@ const AddProductForm: React.FC<Props> = ({ onProductAdd }) => {
           </div>
         </div>
       </div>
+      
       <div className="my-[50px] font-general font-medium text-[14px] flex justify-center">
         <button
           type="button"
