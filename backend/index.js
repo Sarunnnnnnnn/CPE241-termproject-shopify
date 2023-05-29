@@ -544,3 +544,47 @@ app.listen(port, () => {
 
 
 
+app.post("/get_CartItems", (req, res) => {
+  let jwtStatus = TokenManager.checkAuthentication(req);
+  if (jwtStatus !== false) {
+    const customer_id = jwtStatus.id;
+
+    const sql = `
+      SELECT 
+        c.cart_id,
+        c.quantity,
+        p.product_id,
+        p.product_name,
+        p.product_description,
+        p.shop_id,
+        p.category,
+        p.sub_category,
+        p.variation1,
+        p.option1,
+        p.variation2,
+        p.option2,
+        p.product_unitprice,
+        p.product_unitweight
+      FROM 
+        carts AS c
+      INNER JOIN 
+        products AS p ON c.product_id = p.product_id
+      WHERE 
+        c.customer_id = ?
+    `;
+    const values = [customer_id];
+
+    connection.query(sql, values, (err, results, fields) => {
+      if (err) {
+        console.log("Error querying database:", err);
+        return res.status(500).send();
+      }
+
+      return res.status(200).json(results);
+    });
+  } else {
+    res.status(401).send("Unauthorized");
+  }
+});
+
+
