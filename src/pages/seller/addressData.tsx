@@ -8,6 +8,8 @@ interface Address {
     district: string;
     postalCode: string;
     phoneNumber: string;
+    subdistrict:string;
+    
   }
   interface MyAddressProps {
     addresses: Address[];
@@ -22,6 +24,7 @@ export const Address: Address[] = [
     addressDesc: '219/9',
     province: 'กรุงเทพ',
     district: 'พระนคร',
+    subdistrict: 'sss',
     postalCode: '10200',
     phoneNumber: '0619848860',
 }

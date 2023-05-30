@@ -1,6 +1,7 @@
 import{ FC } from 'react';;
 import React, { useState } from 'react';
 
+
 interface Product {
     id: number;
     name: string;
@@ -28,7 +29,7 @@ interface Order {
   const Myorder: React.FC<Props> = ({ orders }) => {
     const completedOrders = orders.filter(order => order.status === 'Completed');
     return (
-      <div className="text-[14px] ml-[80px] mt-12 ">
+      <div className="text-[14px] ml-[80px] mt-[100px] ">
         <h2 className="text-[24px] font-simibold text-[#48466D] not-italic font-medium md:font-medium mb-4 ">Order History</h2>
         {completedOrders.map((order) => (
           <div className=" mb-5  mt-3  max-w-screen-lg" key={order.id}>

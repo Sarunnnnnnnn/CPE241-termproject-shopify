@@ -1,3 +1,6 @@
+import Product1 from '../../images/applewatch.jpg'
+import Product2 from '../../images/lightstrip.jpg'
+
 interface Product {
     id: number;
     name: string;
@@ -29,24 +32,24 @@ interface Order {
       products: [
         {
           id: 1,
-          name: "Product A",
-          image: "https://via.placeholder.com/150",
-          price: 100,
+          name: "Apple Watch",
+          image: Product1,
+          price: 13000,
           quantity:1,
-          variation: "Category A",
+          variation: "Electronics",
         },
         {
           id: 2,
-          name: "Product B",
-          image: "https://via.placeholder.com/150",
-          price: 50,
+          name: "Lightstrip",
+          image: Product2,
+          price: 250,
           quantity:1,
-          variation: "Category B",
+          variation: "Home",
         },
       ],
       customerName: "John Smith",
       customerAddress: "123 Main St. Anytown, USA",
-      orderTotal: 150,
+      orderTotal: 13250,
       date: new Date("2022-01-01T12:00:00Z"),
       status: "Completed",
     },

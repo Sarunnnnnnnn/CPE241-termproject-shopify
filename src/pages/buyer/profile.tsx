@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState , useEffect} from "react";
+import axios from "axios";
 
 interface Profile {
     id: number;
@@ -9,23 +10,9 @@ interface Profile {
     gender: string;
     dateOfBirth: string;
 }
-export const Profile: Profile[] = [
-    {
-        id: 1,
-        firstName: "John",
-        lastName: "Smith",
-        email: "johnS@email.com",
-        phoneNumber: "123456789",
-        gender: "male",
-        dateOfBirth: "01/01/2000",
-    },
-];
 
-interface ProfileProps {
-    profiles: Profile[];
-}
 
-const MyProfile = ({ profiles: initialProfile }: ProfileProps) => {
+const MyProfile = () => {
     const [showForm, setShowForm] = useState(false);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -33,7 +20,43 @@ const MyProfile = ({ profiles: initialProfile }: ProfileProps) => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [gender, setGender] = useState("");
     const [dateOfBirth, setDateOfBirth] = useState("");
-    const [profiles, setAccounts] = useState(initialProfile);
+    const [profiles, setAccounts] = useState<Profile[]>([]);
+
+    const [profile, setCustomerData] = useState({
+        customer_firstname: "",
+        customer_lastname: "",
+        customer_email: "",
+        customer_id: "",
+        customer_gender:"",
+
+      });
+    
+      useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const response = await axios.post(
+              "http://localhost:3001/get_user_customer",
+              null,
+              {
+                headers: {
+                  Authorization: "Bearer " + localStorage.getItem("access_token"),
+                  "Access-Control-Allow-Origin": "*",
+                },
+              }
+            );
+            setCustomerData(response.data);
+            console.log(response.data);
+          } catch (error) {
+            console.error(error);
+          }
+        };
+    
+        fetchData();
+      }, [localStorage.getItem("access_token")]);
+    
+
+
+
 
     const handleEditProfile = () => {
         setShowForm(true);
@@ -49,28 +72,41 @@ const MyProfile = ({ profiles: initialProfile }: ProfileProps) => {
         setDateOfBirth("");
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!firstName || !lastName || !email || !phoneNumber || !gender || !dateOfBirth) {
-            alert("Please fill these information. ");
-            return;
+          alert("Please fill in all the information.");
+          return;
         }
+      
+        try {
+          const accountData = {
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            gender,
+            dateOfBirth,
+          };
+      
+          const headers = {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+            'Access-Control-Allow-Origin': '*',
+          };
+      
+          const response = await axios.post('http://localhost:3001/editProfile', accountData, { headers });
+          const newAccount = response.data; // Assuming the API returns the newly added account
+          setAccounts(prevAccounts => [...prevAccounts, newAccount]);
+          alert('Account added successfully.');
+      
+          window.location.reload();
+          handleCancel();
+        } catch (error) {
+          console.error(error);
+          alert('An error occurred while saving the account.');
+        }
+      };
 
 
-        const newaccount: Profile = {
-            id: profiles
-                .length + 1,
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            phoneNumber: phoneNumber,
-            gender: gender,
-            dateOfBirth: dateOfBirth,
-        };
-        setAccounts([...profiles
-            , newaccount]);
-
-        handleCancel();
-    };
 
     const handleEdit = (profile: Profile) => {
         setShowForm(true);
@@ -89,52 +125,46 @@ const MyProfile = ({ profiles: initialProfile }: ProfileProps) => {
     };
 
     return (
-        <div className="container py-4 ml-[80px] mt-12">
+        <div className="container py-4 ml-[80px] mt-[90px]">
             {" "}
-            <div className="text-[24px] font-simibold text-[#48466D] not-italic font-medium md:font-medium mb-4 ">
+            <div className="text-[24px] font-simibold text-[#48466D] not-italic font-medium md:font-medium mb-4 font-poppins ">
                 {" "}
                 Profile
             </div>
-            {profiles.length === 0 ? (
-                <div className="max-w-screen-lg">
-                    <div className="flex justify-end px-5">
-                        <button
-                            className="w-auto rounded-md border bg-[#48466D] px-5 py-2 text-sm font-medium text-white hover:bg-[#605d91] transition duration-300;"
-                            onClick={handleEditProfile}
-                        >
-                            Edit Profile
-                        </button>
-                    </div>
-                    <div className="border-b border-gray-200 mt-4  "> </div>
-                </div>
-            ) : (
                 <div>
-                    {profiles
-                        .map((profile) => (
-                            <div key={profile.id}>
+                    {profile.customer_id && (
+                            <div key={profile.customer_id}>
                                 <div className="border max-w-screen-xl p-4 my-2">
-                                    <div className="mx-3 text-[16px] text-[#52525B] grid grid-cols-2">
-                                        <div className="col-start-1 col-end-2 flex flex-col gap-6 items-end mr-10">
-                                            <div className=" text-[16px] text-[#94949B] font-bold"> First Name</div>
+                                    <div className="mx-3 text-[16px] text-[#52525B] grid grid-cols-2 ">
+                                        <div className="col-start-1 col-end-2 flex flex-col gap-6 items-end mr-10 font-poppins">
+                                            <div className=" text-[16px] text-[#94949B] font-bold "> First Name</div>
                                             <div className=" text-[16px] text-[#94949B] font-bold"> Last Name</div>
                                             <div className=" text-[16px] text-[#94949B] font-bold"> Email</div>
-                                            <div className=" text-[16px] text-[#94949B] font-bold"> Phone No.</div>
                                             <div className=" text-[16px] text-[#94949B] font-bold"> Gender</div>
-                                            <div className=" text-[16px] text-[#94949B] font-bold"> Date of Birth</div>
+                                           
                                         </div>
-                                        <div className="col-start-2 col-end-3 flex flex-col gap-6">
-                                            <p className=" text-[16px] text-[#52525B]"> {profile.firstName} </p>
-                                            <p className=" text-[16px] text-[#52525B]">{profile.lastName}</p>
-                                            <p className=" text-[16px] text-[#52525B]">{profile.email}</p>
-                                            <p className=" text-[16px] text-[#52525B]">{profile.phoneNumber}</p>
-                                            <p className=" text-[16px] text-[#52525B]">{profile.gender}</p>
-                                            <p className=" text-[16px] text-[#52525B]">{profile.dateOfBirth}</p>
+                                        <div className="col-start-2 col-end-3 flex flex-col gap-6 font-poppins">
+                                            <p className=" text-[16px] text-[#52525B]"> {profile.customer_firstname} </p>
+                                            <p className=" text-[16px] text-[#52525B]">{profile.customer_lastname}</p>
+                                            <p className=" text-[16px] text-[#52525B]">{profile.customer_email}</p>
+                                            <p className=" text-[16px] text-[#52525B]">{profile.customer_gender}</p>
+                                     
                                         </div>
                                     </div>
                                     <div className="flex justify-center mt-4">
                                         <button
                                             className=" justify-center rounded-md border bg-[#48466D] px-5 py-[7.5px] text-sm font-medium text-white hover:bg-[#605d91] transition duration-300"
-                                            onClick={() => handleEdit(profile)}
+                                            onClick={() =>
+                                                handleEdit({
+                                                  id: 0, // Set the appropriate ID value here
+                                                  firstName: profile.customer_firstname,
+                                                  lastName: profile.customer_lastname,
+                                                  email: profile.customer_email,
+                                                  phoneNumber: "", // Set the appropriate phone number value here
+                                                  gender: profile.customer_gender,
+                                                  dateOfBirth: '',
+                                                })
+                                              }
                                         >
                                             Edit
                                         </button>
@@ -142,11 +172,11 @@ const MyProfile = ({ profiles: initialProfile }: ProfileProps) => {
 
                                 </div>
                             </div>
-                        ))}
+                        )}
                 </div>
-            )}
+            
             {showForm && (
-                <div className="fixed z-15 inset-0 overflow-y-auto ">
+                <div className="fixed z-15 inset-0  mt-[50px] ">
                     <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         {/* Background Overlay */}
                         <div
@@ -226,8 +256,9 @@ const MyProfile = ({ profiles: initialProfile }: ProfileProps) => {
                                                     type="text"
                                                     value={phoneNumber}
                                                     onChange={(e) => setPhoneNumber(e.target.value)}
+                                                    maxLength={10}
                                                     id="phoneNumber"
-                                                // placeholder= 
+                        
                                                 />
                                             </div>
                                             <div className="mb-4">

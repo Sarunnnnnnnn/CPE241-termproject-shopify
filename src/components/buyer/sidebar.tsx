@@ -1,6 +1,6 @@
 import React, { FC } from "react";
-import { SidebarData } from "./CustomerSiderbarData";
-import Submenu from "./CustomerSubmenu";
+import { SidebarData } from "../../components/buyer/sidebarData";
+import Submenu from "../../components/buyer/subMenu";
 
 
 const Sidebar: FC = () => {

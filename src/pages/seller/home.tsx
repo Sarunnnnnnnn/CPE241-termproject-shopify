@@ -7,6 +7,7 @@ const Home: FC = () => {
     owner_firstname: '',
     owner_lastname: '',
     owner_email: '',
+    image:''
   });
 
   useEffect(() => {

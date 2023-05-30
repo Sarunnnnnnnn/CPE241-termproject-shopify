@@ -19,20 +19,32 @@ function ShopProfile() {
     const [formData, setFormData] = useState({
         shopname: '',
         shipcom: '',
+        
     });
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            const response = await axios.post('', {
-                shopname: formData.shopname,
-                shipcom: formData.shipcom,
-            });
-            console.log(response.data.message);
+          const response = await axios.post(
+            'http://localhost:3001/shopSeller',
+            {
+              shopname: formData.shopname,
+              shipcom: formData.shipcom,
+              imageBase64: imageUrl.split(',')[1]
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+                'Access-Control-Allow-Origin': '*',
+              },
+            }
+          );
+          console.log(response.data.message);
+          window.location.reload();
         } catch (error) {
-            console.error(error);
+          console.error(error);
         }
-    };
+      };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({
@@ -45,13 +57,14 @@ function ShopProfile() {
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setImageUrl(e.target?.result as string);
-            };
-            reader.readAsDataURL(e.target.files[0]);
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64 = btoa(e.target?.result as string);
+            setImageUrl(`data:image/png;base64,${base64}`);
+          };
+          reader.readAsBinaryString(e.target.files[0]);
         }
-    };
+      };
 
     const handleEditImage = () => {
         const fileInput = document.querySelector<HTMLInputElement>('#shop-logo');

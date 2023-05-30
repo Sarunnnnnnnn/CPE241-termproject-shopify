@@ -3,22 +3,51 @@ import addImage from "../../assets/addImage.svg";
 import deleteIcon from "../../assets/delete.svg";
 
 const UploadImage = () => {
-    const [images, setImages] = useState<File[]>([]);
+    const [images, setImages] = useState<string[]>([]); // เปลี่ยน type เป็น string
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-        if (files) {
-            // Convert FileList to Array and append to existing images array
-            setImages([...images, ...Array.from(files).slice(0, 5 - images.length)]);
-        }
+const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const files = event.target.files;
+  if (files) {
+    const updatedImages: string[] = [];
+
+    // สร้าง Promise เพื่ออ่านและแปลงภาพเป็น base64
+    const readFileAsBase64 = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          const base64String = reader.result as string;
+          resolve(base64String);
+        };
+
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
     };
 
-    const handleImageDelete = (index: number) => {
-        // Create a copy of the images array and remove the image at the specified index
-        const updatedImages = [...images];
-        updatedImages.splice(index, 1);
-        setImages(updatedImages);
-    };
+    // สร้างอาร์เรย์ของ promises สำหรับอ่านและแปลงภาพเป็น base64
+    const promises: Promise<string>[] = Array.from(files)
+      .slice(0, 5 - images.length)
+      .map((file) => readFileAsBase64(file));
+
+    // รัน promises และรอให้ทุกอันเสร็จสิ้น
+    Promise.all(promises)
+      .then((base64Strings) => {
+        // นำ base64Strings มาเก็บในอาร์เรย์ updatedImages
+        updatedImages.push(...base64Strings);
+        setImages([...images, ...updatedImages]);
+      })
+      .catch((error) => {
+        console.error('Error reading files:', error);
+      });
+  }
+};
+
+const handleImageDelete = (index: number) => {
+  const updatedImages = [...images];
+  updatedImages.splice(index, 1);
+  setImages(updatedImages);
+};
 
     return (
         <div className="flex flex-wrap">
@@ -26,7 +55,7 @@ const UploadImage = () => {
                 <div key={index} className="relative mr-3">
                     <img
                         className="h-[120px] w-[120px] object-cover rounded-lg border-[1px] border-[#AFAFAF]"
-                        src={URL.createObjectURL(image)}
+                        src={image}
                         alt={`Product Image ${index}`}
                     />
                     <img

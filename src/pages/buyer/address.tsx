@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import axios from 'axios';
 
 interface Address {
   id: number;
@@ -6,27 +7,23 @@ interface Address {
   addressDesc: string;
   province: string;
   district: string;
+  subdistrict: string;
   postalCode: string;
   phoneNumber: string;
 }
 
-interface MyAddressProps {
-  addresses: Address[];
-  onAddressesUpdate: (addresses: Address[]) => void;
-}
-
-const MyAddress = ({ addresses: initialAddresses }: MyAddressProps) => {
+const MyAddress = () => {
   const [showForm, setShowForm] = useState(false);
-  const [fullName, setFullName] = useState("");
-  const [addressDesc, setAddressDesc] = useState("");
-  const [province, setProvince] = useState("");
-  const [district, setDistrict] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [fullName, setFullName] = useState('');
+  const [addressDesc, setAddressDesc] = useState('');
+  const [province, setProvince] = useState('');
+  const [district, setDistrict] = useState('');
+  const [subdistrict, setSubdistrict] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [addresses, setAddresses] = useState(initialAddresses);
-  const [inputValue, setInputValue] = useState("");
-
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [inputValue, setInputValue] = useState('');
 
   const handleAddAddress = () => {
     setShowForm(true);
@@ -45,108 +42,190 @@ const MyAddress = ({ addresses: initialAddresses }: MyAddressProps) => {
     setAddressDesc("");
     setProvince("");
     setDistrict("");
+    setSubdistrict("");
     setPostalCode("");
     setPhoneNumber("");
     setEditingId(null);
   };
 
-  const handleSave = () => {
-    if (!fullName || !addressDesc || !province || !district || !postalCode || !phoneNumber) {
-      alert("Please fill these information. ");
+  const handleSave = async () => {
+    if (
+      !fullName ||
+      !addressDesc ||
+      !province ||
+      !district ||
+      !postalCode ||
+      !phoneNumber ||
+      !subdistrict
+    ) {
+      alert('Please fill in all the required information.');
       return;
     }
-
-    if (editingId === null) {
-      const newAddress: Address = {
-        id: addresses.length + 1,
+  
+    try {
+      const addressData = {
         fullName,
         addressDesc,
         province,
         district,
+        subdistrict,
         postalCode,
         phoneNumber,
+        shipping_address_id: editingId,
       };
-      setAddresses([...addresses, newAddress]);
-    } else {
-      const editedAddress: Address = {
-        id: editingId,
-        fullName,
-        addressDesc,
-        province,
-        district,
-        postalCode,
-        phoneNumber,
+  
+      const headers = {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        'Access-Control-Allow-Origin': '*',
       };
-      const updatedAddresses = addresses.map((address) =>
-        address.id === editingId ? editedAddress : address
-      );
-      setAddresses(updatedAddresses);
+  
+      if (editingId === null) {
+        // เพิ่มที่อยู่ใหม่
+        const response = await axios.post('http://localhost:3001/Shipping_Address', addressData, { headers });
+        const newAddress = response.data; // สมมุติว่า API จะส่งข้อมูลที่อยู่ที่เพิ่มล่าสุดกลับมา
+        setAddresses([...addresses, newAddress]);
+        alert('Address added successfully.');
+        window.location.reload();
+      } else {
+        // อัปเดตที่อยู่ที่กำลังแก้ไข
+        const response = await axios.post('http://localhost:3001/editAddress_customer', addressData, { headers });
+        if (response.status === 200) {
+          const updatedAddress = response.data; // สมมุติว่า API จะส่งข้อมูลที่อยู่ที่อัปเดตแล้วกลับมา
+          const updatedAddresses = addresses.map((address) =>
+            address.id === editingId ? updatedAddress : address
+          );
+          setAddresses(updatedAddresses);
+          alert('Address updated successfully.');
+          window.location.reload();
+        } else {
+          throw new Error('Failed to update address.');
+        }
+      }
+  
+      handleCancel();
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred while saving the address.');
     }
+  };
+  
+  const [addressData, setAddressData] = useState([] as any[]);
 
-    handleCancel();
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await axios.post('http://localhost:3001/get_addressShipping', null, {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+          "Access-Control-Allow-Origin": "*"
+        },
+      });
+      setAddressData(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleEdit = (address: Address) => {
-    setShowForm(true);
-    setFullName(address.fullName);
-    setAddressDesc(address.addressDesc);
-    setProvince(address.province);
-    setDistrict(address.district);
-    setPostalCode(address.postalCode);
-    setPhoneNumber(address.phoneNumber);
-    setEditingId(address.id);
-  };
+  fetchData();
+}, [localStorage.getItem('access_token')]);;
 
-  const handleDelete = (id: number) => {
-    const filteredAddresses = addresses.filter((address) => address.id !== id);
-    setAddresses(filteredAddresses);
+
+
+const handleEdit = (address: Address) => {
+  setShowForm(true);
+  setFullName(address.fullName);
+  setAddressDesc(address.addressDesc);
+  setProvince(address.province);
+  setDistrict(address.district);
+  setSubdistrict(address.subdistrict);
+  setPostalCode(address.postalCode);
+  setPhoneNumber(address.phoneNumber);
+  setEditingId(address.id);
+};
+
+  const handleDelete = async (address: Address, fullName: string) => {
+    try {
+      const headers = {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        'Access-Control-Allow-Origin': '*',
+      };
+  
+      const requestData = {
+        fullName: fullName,
+      };
+  
+      const response = await axios.post(
+        'http://localhost:3001/deleteAddress_customer',
+        requestData,
+        { headers }
+      );
+  
+      if (response.status === 200) {
+        alert('Address deleted successfully.');
+        window.location.reload();
+      } else {
+        throw new Error('Failed to delete address.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred while deleting the address.');
+    }
   };
 
   return (
-    <div className="container py-4 ml-[80px] mt-12"> <div className="text-[24px] font-simibold text-[#48466D] not-italic font-medium md:font-medium mb-4 "> My Address</div>
-      <div className="max-w-screen-lg">
-        <div className="flex justify-end px-5">
-          <button
-            className="w-auto rounded-md border bg-[#48466D] px-5 py-2 text-sm font-medium text-white hover:bg-[#605d91] transition duration-300;"
-            onClick={handleAddAddress}
-          >
-            Add Address
-          </button>
-        </div>
-        <div className="border-b border-gray-200 mt-4  "> </div>
+    <div className="container py-4 ml-[80px] mt-[100px]">
+    <div className="text-[24px] font-simibold text-[#48466D] not-italic font-medium md:font-medium mb-4">
+      My Address
+    </div>
+    <div className="max-w-screen-lg">
+      <div className="flex justify-end px-5">
+        <button
+          className="w-auto rounded-md border bg-[#48466D] px-5 py-2 text-sm font-medium text-white hover:bg-[#605d91] transition duration-300;"
+          onClick={handleAddAddress}
+        >
+          Add Address
+        </button>
       </div>
+      <div className="border-b border-gray-200 mt-4 "></div>
+    </div>
 
-      <div>
-        {addresses.map((address) => (
-          <div key={address.id} >
-            <div className="border max-w-screen-xl p-4 my-4 grid grid-cols-4">
-              <div className="mx-3 text-[16px] text-[#52525B] col-start-1 col-span-3">
-                <p className="font-bold ">{address.fullName}</p>
-                <p>{address.phoneNumber}</p>
-                <p>{address.addressDesc} {address.district} {address.province} {address.postalCode}</p>
-              </div>
-              <div className="flex justify-end mt-4 col-start-4">
-                <button
-                  className="justify-center rounded-md border border-[#48466D] bg-white px-6 py-2 text-sm font-medium text-[#48466D] hover:bg-[#605d91] hover:text-white transition duration-300; mr-2 h-10"
-                  onClick={() => handleEdit(address)}
-                >
-                  Edit
-                </button>
-                <button
-                  className=" justify-center rounded-md border bg-[#48466D] px-5 py-[7.5px] text-sm font-medium text-white hover:bg-[#605d91] transition duration-300; h-10"
-                  onClick={() => handleDelete(address.id)}
-                >
-                  Delete
-                </button>
+    <div>
+      {addressData && (
+        <>
+          {addressData.map((address) => (
+           <div key={address.shipping_address_id}>
+              <div className="border max-w-screen-xl p-4 my-4 grid grid-cols-4">
+                <div className="mx-3 text-[16px] text-[#52525B] col-start-1 col-span-3">
+                  <p className="font-bold">{address.recipient_name}</p>
+                  <p>{address.recipient_address_details} {address.recipient_subdistrict}</p>
+                  <p>
+                     {address.recipient_district} {address.recipient_province} {address.recipient_zip_code}
+                  </p>
+                    <p>{address.recipient_tel_no}</p>
+                </div>
+                <div className="flex justify-end mt-4 col-start-4">
+                  <button
+                    className="justify-center rounded-md border border-[#48466D] bg-white px-6 py-2 text-sm font-medium text-[#48466D] hover:bg-[#605d91] hover:text-white transition duration-300; mr-2 h-10"
+                    onClick={() => handleEdit(address)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="justify-center rounded-md border bg-[#48466D] px-5 py-[7.5px] text-sm font-medium text-white hover:bg-[#605d91] transition duration-300; h-10"
+                    onClick={() => handleDelete(address, address.recipient_name)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-
-      </div>
-
+          ))}
+        </>
+      )}
+    </div>
       {showForm && (
-        <div className="fixed z-15 inset-0 overflow-y-auto ">
+        <div className="fixed z-15 inset-0 overflow-y-auto mt-[70px]">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             {/* Background Overlay */}
             <div
@@ -254,6 +333,22 @@ const MyAddress = ({ addresses: initialAddresses }: MyAddressProps) => {
                           )}
                         </select>
                       </div>
+                      <div className="mb-4 ">
+                        <label
+                          className="block  font-simibold text-[#48466D] not-italic font-bold mb-2 "
+                          htmlFor="subdistrict"
+                        >
+                          Subdistrict
+                        </label>
+                        <input
+                          className="border rounded-lg w-[430px] py-2 px-3 text-[#48466D] leading-tight focus:outline-none focus:shadow-outline"
+                          type="text"
+                          value={subdistrict}
+                          onChange={(e) => setSubdistrict(e.target.value)}
+                          id="subdistrict"
+                          placeholder="Sub-District"
+                        />
+                      </div>
                       <div className="mb-4">
                         <label
                           className="block text-[#48466D] font-bold mb-2"
@@ -285,6 +380,7 @@ const MyAddress = ({ addresses: initialAddresses }: MyAddressProps) => {
                           value={phoneNumber}
                           onChange={(e) => setPhoneNumber(e.target.value)}
                           id="phoneNumber"
+                          maxLength={10}
                           placeholder="Phone Number"
 
 

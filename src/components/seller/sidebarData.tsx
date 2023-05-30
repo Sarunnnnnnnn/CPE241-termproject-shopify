@@ -45,7 +45,7 @@ export const SidebarData:SideBarItem[] = [
             },
             {
                 title: 'Add New Product',
-                path: '/myProducts/orderHistory',
+                path: '/addNewProduct',
             },
             {
                 title: 'Stock History',
@@ -109,7 +109,6 @@ export const SidebarData:SideBarItem[] = [
                 title: 'Shop profile',
                 path: '/shopProfile',
             }
-
         ]
     },
 ]

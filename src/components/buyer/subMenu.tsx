@@ -1,7 +1,7 @@
 import React, { FC, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { SideBarItem } from "../models/SideBarItem";
+import { SideBarItem } from "../../models/SideBarItem";
 
 
 type SidebarLinkprops = {
@@ -24,7 +24,7 @@ const Submenu: FC<SidebarLinkprops> = ({ item }) => {
         </div>
         <div
           onClick={showSubnav}
-          className="flex flex-row text-[16px] text-[#48466D] not-italic font-medium md:font-medium ml-[90px] m-11 w-[200px]"
+          className="flex flex-row text-[16px] text-[#48466D] not-italic font-medium md:font-medium ml-[90px] m-11 w-[200px] font-poppins"
         >
           {item.icon}
           <div className="ml-3.5 basis-[90%]">{item.title} </div>
@@ -38,7 +38,7 @@ const Submenu: FC<SidebarLinkprops> = ({ item }) => {
             return (
               <DropdownLink to={item.path} key = {index}>
               <div className="">
-                <div className="ml-[120px] m-4 text-[16px] text-[#48466D] not-italic font-medium md:font-medium">
+                <div className="ml-[120px] m-4 text-[16px] text-[#48466D] not-italic font-medium md:font-medium font-poppins">
                   {" "}
                   {item.title}{" "}
                 </div>
