@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
 interface Product {
     id: number;
@@ -68,8 +68,12 @@ const Cart: React.FC<CartItemProps> = ({ products }) => {
             price: product.price,
         }));
 
-        // Send the payload to a server or an external API
-        console.log('Selected products:', payload);
+        // Send the payload to the checkout page
+        const history = useHistory(); // Access the history object
+        history.push({
+            pathname: '/checkout', // Specify the checkout page pathname
+            state: { payload }, // Pass the payload as a state to the checkout page
+        });
 
         // Reset the state of the cart
         setSelectedItems([]);
